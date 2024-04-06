@@ -14,22 +14,36 @@ class Iterator
         virtual Type GetCurrent() const = 0;
 };
 
-enum class Hands {One, Two, Three, Four};
+enum class MutantType : int {Gargoyle, Wolfman, Vampire, Unknown};
 
-enum class MutantType {Ghoul, Vampire, Crap, Werewolf};
+enum class StregthOfHands : int {High, Medium, Low};
 
-enum class Legs {One, Two, Three, Four};
+enum class StregthOfLegs : int {High, Medium, Low};
 
+enum class Age : int {Old, Young, Newborn};
+
+StregthOfHands GetRandomHandPower();
+StregthOfLegs GetRandomLegPower();
+Age GetRandomAge();
 class Scum
 {
     protected:
-        bool HasWings;
-        Scum();
+        StregthOfHands HandPower;
+        StregthOfLegs LegPower;
+        Age AgeOfMutant;
+        Scum()
+        {
+            HandPower = GetRandomHandPower();
+            LegPower = GetRandomLegPower();
+            AgeOfMutant = GetRandomAge();
+        };
     public:
-        bool IsHasWings() const {return HasWings;};
-        virtual Hands GetHandsAmount() const = 0;
-        virtual MutantType GetMutantType() const = 0;
-        virtual Legs GetLegsAmount() const = 0;
+        StregthOfHands GetHandPower() const{return HandPower;};
+        StregthOfLegs GetLegPower() const{return LegPower;};
+        Age GetAgeOfMutant() const{return AgeOfMutant;};
+        virtual void Summon() const = 0;
+        virtual void Kill() const = 0;
+        virtual MutantType GetType() const = 0;
 };
 
 typedef Scum * ScumPointer;
