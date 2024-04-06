@@ -89,7 +89,7 @@ void Task1(MutantContainer *scumcell)
         const ScumPointer currentMutant = scumcell->GetByIndex(i);
         if (currentMutant->GetType() == MutantType::Wolfman)
         {
-            cout << i << "   " << PrintMutantType(currentMutant->GetType())<< "\n"; 
+            currentMutant->Kill(); 
         };
     };
 };
@@ -98,9 +98,17 @@ int main()
 {
     //cout << "hello world" << "\n";
     MutantContainer scumcell(100);
-    for (int i = 0; i<50; i++)
+    for (int i = 0; i<25; i++)
     {
         scumcell.AddMutant(new Wolfman);
+    };
+    for (int i = 26; i<25; i++)
+    {
+        scumcell.AddMutant(new Vampire);
+    };
+    for (int i = 52; i<40; i++)
+    {
+        scumcell.AddMutant(new Gargoyle);
     };
     Task1(&scumcell);
 };
