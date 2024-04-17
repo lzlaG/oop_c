@@ -94,6 +94,18 @@ void Task1(MutantContainer *scumcell)
     };
 };
 
+void Task1_it(Iterator<ScumPointer> * it)
+{
+    for (it->First(); !it->IsDone(); it->Next())
+    {
+        const ScumPointer currentMutant = it->GetCurrent();
+        if(currentMutant->GetType() == MutantType::Wolfman)
+        {
+            currentMutant->Kill();
+        };
+    };
+};
+
 int main()
 {
     //cout << "hello world" << "\n";
@@ -110,5 +122,7 @@ int main()
     {
         scumcell.AddMutant(new Gargoyle);
     };
-    Task1(&scumcell);
+    //Task1(&scumcell);
+    Iterator<ScumPointer> *it = scumcell.GetIterator();
+    Task1_it(it);
 };
