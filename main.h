@@ -1,5 +1,8 @@
+#include <vector>
 #ifndef ScumH
 #define ScumH
+
+
 
 template<class Type>
 class Iterator

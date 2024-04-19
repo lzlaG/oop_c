@@ -1,3 +1,4 @@
 .vscode
 1
 build
+*.layout
