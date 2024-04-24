@@ -2,8 +2,6 @@
 #ifndef ScumH
 #define ScumH
 
-
-
 template<class Type>
 class Iterator
 {
@@ -52,6 +50,12 @@ class Scum
 
 typedef Scum * ScumPointer;
 
+class ScumContainer
+{
+    public:
+        //virtual void AddMutant(ScumPointer newMutant);
+        virtual int GetCount() const = 0;
+};
 
 class MutantContainerIterator : public Iterator<ScumPointer>
 {
@@ -72,7 +76,7 @@ class MutantContainerIterator : public Iterator<ScumPointer>
         ScumPointer GetCurrent() const { return ScumCell[Pos];}
 };
 
-class MutantContainer
+class MutantContainer : public ScumContainer
 {
     private:
         ScumPointer * ScumCell;
@@ -95,6 +99,7 @@ void MutantContainer::AddMutant(ScumPointer newMutant)
     ScumCell[MutantCount] = newMutant;
     MutantCount++;
 }
+
 MutantContainer::MutantContainer(int maxSize)
 {
     ScumCell = new ScumPointer[maxSize];
@@ -120,5 +125,5 @@ MutantContainer::~MutantContainer()
 };
 
 
-
+//class 
 #endif ScumH

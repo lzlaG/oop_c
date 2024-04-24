@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <list>
-# include "main.h"
+#include "main.h"
 
 using namespace std;
 
@@ -127,7 +127,7 @@ class WildMutantContainerIterator : public Iterator<ScumPointer>
 };
 
  
-class WildMutantContainer
+class WildMutantContainer : public ScumContainer
 {
     private:
         vector<ScumPointer> ScumCell;
@@ -139,6 +139,7 @@ class WildMutantContainer
             return new WildMutantContainerIterator(&ScumCell);
         };
 };
+
 void Kill_vampires (Iterator<ScumPointer> *it)
 {
     for (it->First(); it->IsDone(); it->Next())
@@ -146,7 +147,7 @@ void Kill_vampires (Iterator<ScumPointer> *it)
         const ScumPointer currentMutant = it->GetCurrent();
         if(currentMutant->GetType() == MutantType::Vampire)
         {
-            currentMutant->Kill();
+            currentMutant->Summon();
         }
     }
 }
