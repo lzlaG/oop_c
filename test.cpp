@@ -122,7 +122,7 @@ class WildMutantContainerIterator : public Iterator<ScumPointer>
         }
         void First() { it = ScumCell->begin();}
         void Next() {it++;}
-        bool IsDone() const {return it != ScumCell->end();}
+        bool IsDone() const {return it == ScumCell->end();}
         ScumPointer GetCurrent() const {return *it;}
 };
 
@@ -195,14 +195,15 @@ void DecoratorTask(Iterator<ScumPointer> *it)
     for(it->First(); !it->IsDone(); it->Next())
     {
         const ScumPointer currentMutant = it->GetCurrent();
-        cout<< PrintMutantType(currentMutant->GetType())<< " " << PrintLegPower(currentMutant->GetLegPower()) << " " << PrintHandPower(currentMutant->GetHandPower()) << "\n";
-        //SelfSpec(currentMutant);
+        //SelfSpec(currentMutant); 
+        cout << PrintMutantType(currentMutant->GetType()) << " пожилой" << "\n";
     }
 }
 int main()
 {
     //cout << "hello world" << "\n";
-    MutantContainer scumcell(100);
+    //MutantContainer scumcell(100);
+    WildMutantContainer scumcell;
     for (int i = 0; i<25; i++)
     {
         scumcell.AddMutant(new Wolfman);
@@ -216,7 +217,9 @@ int main()
         scumcell.AddMutant(new Gargoyle);
     };
     //Task1(&scumcell);
-    Iterator<ScumPointer> *it =  new DecoratorHandsPower(scumcell.GetIterator(),StregthOfHands::High);
+    Iterator<ScumPointer> *it =  new DecoratorAge(
+        new DecoratorType(scumcell.GetIterator(), MutantType::Gargoyle), Age::Old);
+    //PrintMutantType()
     DecoratorTask(it);
     //Kill_vampires(it);
 };

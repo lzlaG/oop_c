@@ -52,7 +52,7 @@ typedef Scum * ScumPointer;
 class ScumContainer
 {
     public:
-        //virtual void AddMutant(ScumPointer newMutant);
+        virtual void AddMutant(ScumPointer newMutant) = 0;
         virtual int GetCount() const = 0;
 };
 
@@ -194,6 +194,60 @@ class DecoratorHandsPower : public Decorator<ScumPointer>
             }while(!It->IsDone() && It->GetCurrent()->GetHandPower()!= TargetHands);
         }
 
+};
+
+class DecoratorAge : public Decorator<ScumPointer>
+{
+    private:
+        Age TargetAge;
+    public:
+        DecoratorAge(Iterator<ScumPointer> *it, Age targetAge ) : Decorator(it)
+        {
+            TargetAge = targetAge;
+        }
+        void First()
+        {
+            It->First();
+            while(!It->IsDone() && It-> GetCurrent()->GetAgeOfMutant() != TargetAge)
+            {
+                It->Next();
+            }
+        }
+        void Next()
+        {
+            do
+            {
+                It->Next();
+
+            }while(!It->IsDone() && It->GetCurrent()->GetAgeOfMutant()!= TargetAge);
+        }
+};
+
+class DecoratorType : public Decorator<ScumPointer>
+{
+    private:
+        MutantType TargetType;
+    public:
+        DecoratorType(Iterator<ScumPointer> *it, MutantType targetType ) : Decorator(it)
+        {
+            TargetType = targetType;
+        }
+        void First()
+        {
+            It->First();
+            while(!It->IsDone() && It-> GetCurrent()->GetType() != TargetType)
+            {
+                It->Next();
+            }
+        }
+        void Next()
+        {
+            do
+            {
+                It->Next();
+
+            }while(!It->IsDone() && It->GetCurrent()->GetType()!= TargetType);
+        }
 };
 
 #endif ScumH
