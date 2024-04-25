@@ -59,9 +59,8 @@ class Gargoyle : public Scum
 class Wolfman : public Scum
 {
     public:
-        int x = random()%(50-5+1)+1;
         MutantType GetType() const {return MutantType::Wolfman;};
-        void Run(int x) const {cout << "Оборотень пробежал " << x << " км " << endl; }
+        void Run(int x) { cout << "Оборотень пробежал " << x << " км " << endl;}
         void Summon() const { cout << " Призвали оборотня " << "\n";};
         void Kill() const { cout << " убили оборотня " << "\n";};
 };
@@ -70,7 +69,7 @@ class Vampire : public Scum
 {
     public:
         MutantType GetType() const {return MutantType::Vampire;}
-        void Blood(int x) const {cout << " Вампир выпил " << x << " литров крови " << endl;}
+        void Blood(int x) {cout << "Вампир выпил " << x << " литров крови " << endl;}
         void Summon() const { cout << " Призвали вампира " << "\n";}
         void Kill() const { cout << " убили вампира" << "\n";}
 };
@@ -170,16 +169,36 @@ string PrintHandPower (const StregthOfHands type)
         case StregthOfHands::High: return "Мощные руки";
     }
 }
+
+void SelfSpec (ScumPointer currentMutant)
+{
+    int x = random()%(5000-10+1)+1;
+    if(currentMutant->GetType() == MutantType::Wolfman)
+    {
+        Wolfman* wolfman = dynamic_cast<Wolfman*>(currentMutant);
+        wolfman->Run(x);
+    }
+    if (currentMutant->GetType() == MutantType::Vampire)
+    {
+        Vampire* vampire = dynamic_cast<Vampire*>(currentMutant);
+        vampire->Blood(x);
+    }
+    if (currentMutant->GetType() == MutantType::Gargoyle)
+    {
+        Gargoyle* gargoyle = dynamic_cast<Gargoyle*>(currentMutant);
+        gargoyle->Fly(x);
+    }
+}
+
 void DecoratorTask(Iterator<ScumPointer> *it)
 {
     for(it->First(); !it->IsDone(); it->Next())
     {
         const ScumPointer currentMutant = it->GetCurrent();
-
         cout<< PrintMutantType(currentMutant->GetType())<< " " << PrintLegPower(currentMutant->GetLegPower()) << " " << PrintHandPower(currentMutant->GetHandPower()) << "\n";
+        //SelfSpec(currentMutant);
     }
 }
-
 int main()
 {
     //cout << "hello world" << "\n";
@@ -197,10 +216,7 @@ int main()
         scumcell.AddMutant(new Gargoyle);
     };
     //Task1(&scumcell);
-    Iterator<ScumPointer> *it =  
-        new DecoratorHandsPower(
-        new DecoratorLegPower(scumcell.GetIterator(), StregthOfLegs::Medium),
-        StregthOfHands::High);
+    Iterator<ScumPointer> *it =  new DecoratorHandsPower(scumcell.GetIterator(),StregthOfHands::High);
     DecoratorTask(it);
     //Kill_vampires(it);
 };

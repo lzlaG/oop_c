@@ -39,7 +39,6 @@ class Scum
             AgeOfMutant = GetRandomAge();
         };
     public:
-
         StregthOfHands GetHandPower() const{return HandPower;};
         StregthOfLegs GetLegPower() const{return LegPower;};
         Age GetAgeOfMutant() const{return AgeOfMutant;};
