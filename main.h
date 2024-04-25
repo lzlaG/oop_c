@@ -125,5 +125,76 @@ MutantContainer::~MutantContainer()
 };
 
 
-//class 
+template<class Type>
+class Decorator : public Iterator<Type>
+{
+    protected:
+        Iterator<Type> *It;
+    public:
+        Decorator (Iterator<Type> *it)
+        {
+            It = it;
+        }
+        virtual ~Decorator() {delete It;}
+        void First() {It->First();}
+        void Next() {It->Next();}
+        bool IsDone() const {return It->IsDone();}
+        Type GetCurrent() const { return It->GetCurrent(); }
+};
+
+class DecoratorLegPower : public Decorator<ScumPointer>
+{
+    private:
+        StregthOfLegs TargetLegs;
+    public:
+        DecoratorLegPower(Iterator<ScumPointer> *it, StregthOfLegs targetLegs) : Decorator(it)
+        {
+            TargetLegs = targetLegs;
+        }
+        void First()
+        {
+            It->First();//позиционируем в начало итератор
+            while(!It->IsDone() && It-> GetCurrent()->GetLegPower() != TargetLegs)
+            {
+                It->Next();
+            }
+        }
+        void Next()
+        {
+            do
+            {
+                It->Next();
+
+            }while(!It->IsDone() && It->GetCurrent()->GetLegPower()!= TargetLegs);
+        }
+};
+
+class DecoratorHandsPower : public Decorator<ScumPointer>
+{
+    private:
+        StregthOfHands TargetHands;
+    public:
+        DecoratorHandsPower(Iterator<ScumPointer> *it, StregthOfHands targetHands) :Decorator(it)
+        {
+            TargetHands = targetHands;
+        }
+        void First()
+        {
+            It->First();//позиционируем в начало итератор
+            while(!It->IsDone() && It-> GetCurrent()->GetHandPower() != TargetHands)
+            {
+                It->Next();
+            }
+        }
+        void Next()
+        {
+            do
+            {
+                It->Next();
+
+            }while(!It->IsDone() && It->GetCurrent()->GetHandPower()!= TargetHands);
+        }
+
+};
+
 #endif ScumH

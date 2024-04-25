@@ -59,6 +59,7 @@ class Gargoyle : public Scum
 class Wolfman : public Scum
 {
     public:
+        int x = random()%(50-5+1)+1;
         MutantType GetType() const {return MutantType::Wolfman;};
         void Run(int x) const {cout << "Оборотень пробежал " << x << " км " << endl; }
         void Summon() const { cout << " Призвали оборотня " << "\n";};
@@ -151,11 +152,38 @@ void Kill_vampires (Iterator<ScumPointer> *it)
         }
     }
 }
+string PrintLegPower (const StregthOfLegs type)
+{
+    switch (type)
+    {
+        case StregthOfLegs::Low: return "Слабые ноги";
+        case StregthOfLegs::Medium: return "Средние ноги";
+        case StregthOfLegs::High: return "Сильные ноги";
+    }
+}
+string PrintHandPower (const StregthOfHands type)
+{
+    switch (type)
+    {
+        case StregthOfHands::Low: return "Слабые руки";
+        case StregthOfHands::Medium: return "Средние руки";
+        case StregthOfHands::High: return "Мощные руки";
+    }
+}
+void DecoratorTask(Iterator<ScumPointer> *it)
+{
+    for(it->First(); !it->IsDone(); it->Next())
+    {
+        const ScumPointer currentMutant = it->GetCurrent();
+
+        cout<< PrintMutantType(currentMutant->GetType())<< " " << PrintLegPower(currentMutant->GetLegPower()) << " " << PrintHandPower(currentMutant->GetHandPower()) << "\n";
+    }
+}
 
 int main()
 {
     //cout << "hello world" << "\n";
-    WildMutantContainer scumcell;
+    MutantContainer scumcell(100);
     for (int i = 0; i<25; i++)
     {
         scumcell.AddMutant(new Wolfman);
@@ -169,6 +197,10 @@ int main()
         scumcell.AddMutant(new Gargoyle);
     };
     //Task1(&scumcell);
-    Iterator<ScumPointer> *it = scumcell.GetIterator();
-    Kill_vampires(it);
+    Iterator<ScumPointer> *it =  
+        new DecoratorHandsPower(
+        new DecoratorLegPower(scumcell.GetIterator(), StregthOfLegs::Medium),
+        StregthOfHands::High);
+    DecoratorTask(it);
+    //Kill_vampires(it);
 };
