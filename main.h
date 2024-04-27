@@ -39,9 +39,9 @@ class Scum
             AgeOfMutant = GetRandomAge();
         };
     public:
-        StregthOfHands GetHandPower() const{return HandPower;};
-        StregthOfLegs GetLegPower() const{return LegPower;};
-        Age GetAgeOfMutant() const{return AgeOfMutant;};
+        StregthOfHands GetHandPower() {return HandPower;};
+        StregthOfLegs GetLegPower() {return LegPower;};
+        Age GetAgeOfMutant() {return AgeOfMutant;};
         virtual void Summon() const = 0;
         virtual void Kill() const = 0;
         virtual MutantType GetType() const = 0;

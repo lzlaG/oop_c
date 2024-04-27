@@ -7,42 +7,39 @@ using namespace std;
 
 StregthOfHands GetRandomHandPower()
 {
-    int x = random()%(3-1+1)+1;
-    switch (x)
+    switch (random()%3)
     {
-        case 1:
+        case 0:
             return StregthOfHands::High;
-        case 2:
+        case 1:
             return StregthOfHands::Medium;
-        case 3:
+        case 2:
             return StregthOfHands::Low;
     };
 };
 
 StregthOfLegs GetRandomLegPower()
 {
-   int x = random()%(3-1+1)+1;
-    switch (x)
+    switch (random()%3)
     {
-        case 1:
+        case 0:
             return StregthOfLegs::High;
-        case 2:
+        case 1:
             return StregthOfLegs::Medium;
-        case 3:
+        case 2:
             return StregthOfLegs::Low;
     }; 
 };
 
 Age GetRandomAge()
 {
-    int x = random()%(3-1+1)+1;
-    switch (x)
+    switch (random()%3)
     {
-        case 1:
+        case 0:
             return Age::Young;
-        case 2:
+        case 1:
             return Age::Old;
-        case 3:
+        case 2:
             return Age::Newborn;
     }; 
 };
@@ -85,28 +82,20 @@ string PrintMutantType(const MutantType type)
 	}
 };
 
-void kill_wolfmans(MutantContainer *scumcell)
+void PrintAgeOfMutant(const Age type)
 {
-    for (int i=0; i<scumcell->GetCount(); i++)
+    switch(type)
     {
-        const ScumPointer currentMutant = scumcell->GetByIndex(i);
-        if (currentMutant->GetType() == MutantType::Wolfman)
-        {
-            currentMutant->Kill(); 
-        };
-    };
-};
-
-void kill_wolfmans_it(Iterator<ScumPointer> * it)
-{
-    for (it->First(); !it->IsDone(); it->Next())
-    {
-        const ScumPointer currentMutant = it->GetCurrent();
-        if(currentMutant->GetType() == MutantType::Wolfman)
-        {
-            currentMutant->Kill();
-        };
-    };
+        case Age::Old: 
+            cout << "Пожилой" << "\n";
+            break;
+        case Age::Young: 
+            cout << "Молодой" << "\n";
+            break;
+        case Age::Newborn: 
+            cout << "Новорожденный" << "\n";
+            break;
+    }
 };
 
 class WildMutantContainerIterator : public Iterator<ScumPointer>
@@ -172,6 +161,7 @@ string PrintHandPower (const StregthOfHands type)
 
 void SelfSpec (ScumPointer currentMutant)
 {
+    ;
     int x = random()%(5000-10+1)+1;
     if(currentMutant->GetType() == MutantType::Wolfman)
     {
@@ -190,20 +180,37 @@ void SelfSpec (ScumPointer currentMutant)
     }
 }
 
-void DecoratorTask(Iterator<ScumPointer> *it)
+void ItogTask(Iterator<ScumPointer> *it)
 {
     for(it->First(); !it->IsDone(); it->Next())
     {
         const ScumPointer currentMutant = it->GetCurrent();
         //SelfSpec(currentMutant); 
-        cout << PrintMutantType(currentMutant->GetType()) << " пожилой" << "\n";
+        cout << "----------------------------------" << "\n";
+        cout << PrintMutantType(currentMutant->GetType()) << "\n";
+        cout << PrintHandPower(currentMutant->GetHandPower()) << "\n";
+        cout << PrintLegPower(currentMutant->GetLegPower()) << "\n";
+        PrintAgeOfMutant(currentMutant->GetAgeOfMutant());
+
     }
 }
+
+Scum *MutantFactory(MutantType newMutant)
+{
+    switch(newMutant)
+    {
+        case MutantType::Gargoyle: return  new Gargoyle;
+		case MutantType::Vampire: return  new Vampire;
+		case MutantType::Wolfman: return  new Wolfman;
+    }
+}
+
 int main()
 {
-    //cout << "hello world" << "\n";
+    srand(time(NULL));
     //MutantContainer scumcell(100);
     WildMutantContainer scumcell;
+    /*
     for (int i = 0; i<25; i++)
     {
         scumcell.AddMutant(new Wolfman);
@@ -216,10 +223,38 @@ int main()
     {
         scumcell.AddMutant(new Gargoyle);
     };
+    */
     //Task1(&scumcell);
-    Iterator<ScumPointer> *it =  new DecoratorAge(
-        new DecoratorType(scumcell.GetIterator(), MutantType::Gargoyle), Age::Old);
+    int random_amount_of_mutant = random()%(100-10+1)+1;
+    cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
+
+    for (int i=0; i<=random_amount_of_mutant; i++)
+    {
+        scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
+    };
+    Iterator<ScumPointer> *it =  scumcell.GetIterator();
     //PrintMutantType()
-    DecoratorTask(it);
+    Iterator<ScumPointer> *sorting_it = new DecoratorAge(it, Age::Old);
+    for(;;)
+    {
+        int choise;
+        cout << "Вывести отсортированный или нет?(1,2-выбор вывода 3-выход)" << "\n";
+        cin >> choise;
+        if (choise == 3)
+        {
+            break;
+        }
+        switch(choise)
+        {
+            case 1:
+                cout << "Вывод отсортированного " << "\n";
+                ItogTask(sorting_it);
+                break;
+            case 2:
+                cout << "Вывод несортированного " << "\n";
+                ItogTask(it);
+                break;
+        }
+    }
     //Kill_vampires(it);
 };
