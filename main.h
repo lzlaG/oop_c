@@ -82,14 +82,7 @@ class DBMutantContainerIterator : public Iterator<ScumPointer>
 {
 
 };
-void executeSQL(sqlite3* db, const string& sql) {
-    char* errMsg = nullptr;
-    int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
-    if (rc != SQLITE_OK) {
-        cerr << "Error executing SQL statement: " << errMsg << endl;
-        sqlite3_free(errMsg);
-    }
-};
+
 class DBMutantContainer //:public ScumContainer
 {
     private:
@@ -102,17 +95,18 @@ class DBMutantContainer //:public ScumContainer
             {
                 cout << "Ошибка открытия базы данных!" << endl;
             };
-            string createtable = "CREATE TABLE IF NOT EXISTS Mutants ("
+            const char *createtable = "CREATE TABLE Mutants ("
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
                 "MutantType VARCHAR(15),"
-                "StregthOfHands VARCHAR(15),"
-                "StregthOfLegs VARCHAR(15),"
-                "Age VARCHAR(15)"
-            ");";
-            executeSQL(DB, createtable);
+                "StrengthOfHands VARCHAR(15),"
+                "StrengthOfLegs VARCHAR(15),"
+                "Age VARCHAR(15));";
+            char *errmsg;
+            sqlite3_exec( DB, createtable, NULL, NULL, &errmsg);
+            cout << errmsg << "\n";
         };
         //virtual ~DBMutantContainer();
-        //void AddMutant(ScumPointer newMutant);
+        void AddMutant(ScumPointer newMutant);
         //int GetCount();
 };
 

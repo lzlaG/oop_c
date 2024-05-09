@@ -83,19 +83,13 @@ string PrintMutantType(const MutantType type)
 	}
 };
 
-void PrintAgeOfMutant(const Age type)
+string PrintAgeOfMutant(const Age type)
 {
     switch(type)
     {
-        case Age::Old: 
-            cout << "Пожилой" << "\n";
-            break;
-        case Age::Young: 
-            cout << "Молодой" << "\n";
-            break;
-        case Age::Newborn: 
-            cout << "Новорожденный" << "\n";
-            break;
+        case Age::Old: return "ПОЖИЛОЙ";
+        case Age::Young: return "МОЛОДОЙ";
+        case Age::Newborn: return "Новорожденный";
     }
 };
 
@@ -116,7 +110,7 @@ class WildMutantContainerIterator : public Iterator<ScumPointer>
         ScumPointer GetCurrent() const {return *it;}
 };
 
- 
+
 class WildMutantContainer : public ScumContainer
 {
     private:
@@ -128,6 +122,10 @@ class WildMutantContainer : public ScumContainer
         {
             return new WildMutantContainerIterator(&ScumCell);
         };
+};
+
+string quotesql( const string& s ) {
+    return string("'") + s + string("'");
 };
 
 string PrintLegPower (const StregthOfLegs type)
@@ -148,6 +146,22 @@ string PrintHandPower (const StregthOfHands type)
         case StregthOfHands::High: return "Мощные руки";
     }
 }
+
+void DBMutantContainer::AddMutant(ScumPointer newMutant)
+{
+    string mutanttype = PrintMutantType(newMutant->GetType());
+    string handpower = PrintHandPower(newMutant->GetHandPower());
+    string legpower = PrintLegPower(newMutant->GetLegPower());
+    string ageofmutant = PrintAgeOfMutant(newMutant->GetAgeOfMutant());
+    string query = "INSERT INTO Mutants (MutantType, StrengthOfHands, StrengthOfLegs, Age) VALUES ("
+    +quotesql(mutanttype)+","
+    +quotesql(handpower)+","
+    +quotesql(legpower)+","
+    +quotesql(ageofmutant)+");";
+    char *errmsg;
+    sqlite3_exec(DB, query.c_str(), NULL, NULL, &errmsg);
+    cout << errmsg << "\n";
+};
 
 void SelfSpec (ScumPointer currentMutant)
 {
@@ -200,6 +214,7 @@ int main()
     srand(time(NULL));
     //MutantContainer scumcell(100);
     DBMutantContainer scumcell("mydb.db");
+    scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
     /*
     WildMutantContainer scumcell;
     int random_amount_of_mutant = random()%(100-10+1)+1;
