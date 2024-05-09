@@ -1,6 +1,10 @@
 #include <vector>
+#include <sqlite3.h>
+#include <string>
 #ifndef ScumH
 #define ScumH
+
+using namespace std;
 
 template<class Type>
 class Iterator
@@ -73,6 +77,43 @@ class MutantContainerIterator : public Iterator<ScumPointer>
         void Next() { Pos++; }
         bool IsDone() const { return Pos >= Count;}
         ScumPointer GetCurrent() const { return ScumCell[Pos];}
+};
+class DBMutantContainerIterator : public Iterator<ScumPointer>
+{
+
+};
+void executeSQL(sqlite3* db, const string& sql) {
+    char* errMsg = nullptr;
+    int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "Error executing SQL statement: " << errMsg << endl;
+        sqlite3_free(errMsg);
+    }
+};
+class DBMutantContainer //:public ScumContainer
+{
+    private:
+        sqlite3* DB;
+    public:
+        DBMutantContainer(const string& DBName)
+        {
+            int db = sqlite3_open(DBName.c_str(), &DB);
+            if (db != SQLITE_OK)
+            {
+                cout << "Ошибка открытия базы данных!" << endl;
+            };
+            string createtable = "CREATE TABLE IF NOT EXISTS Mutants ("
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "MutantType VARCHAR(15),"
+                "StregthOfHands VARCHAR(15),"
+                "StregthOfLegs VARCHAR(15),"
+                "Age VARCHAR(15)"
+            ");";
+            executeSQL(DB, createtable);
+        };
+        //virtual ~DBMutantContainer();
+        //void AddMutant(ScumPointer newMutant);
+        //int GetCount();
 };
 
 class MutantContainer : public ScumContainer

@@ -2,6 +2,7 @@
 #include <vector>
 #include <list>
 #include "main.h"
+#include <sqlite3.h>
 
 using namespace std;
 
@@ -129,17 +130,6 @@ class WildMutantContainer : public ScumContainer
         };
 };
 
-void Kill_vampires (Iterator<ScumPointer> *it)
-{
-    for (it->First(); it->IsDone(); it->Next())
-    {
-        const ScumPointer currentMutant = it->GetCurrent();
-        if(currentMutant->GetType() == MutantType::Vampire)
-        {
-            currentMutant->Summon();
-        }
-    }
-}
 string PrintLegPower (const StregthOfLegs type)
 {
     switch (type)
@@ -209,22 +199,9 @@ int main()
 {
     srand(time(NULL));
     //MutantContainer scumcell(100);
-    WildMutantContainer scumcell;
+    DBMutantContainer scumcell("mydb.db");
     /*
-    for (int i = 0; i<25; i++)
-    {
-        scumcell.AddMutant(new Wolfman);
-    };
-    for (int i = 0; i<15; i++)
-    {
-        scumcell.AddMutant(new Vampire);
-    };
-    for (int i = 0; i<45; i++)
-    {
-        scumcell.AddMutant(new Gargoyle);
-    };
-    */
-    //Task1(&scumcell);
+    WildMutantContainer scumcell;
     int random_amount_of_mutant = random()%(100-10+1)+1;
     cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
 
@@ -257,4 +234,5 @@ int main()
         }
     }
     //Kill_vampires(it);
+    */
 };
