@@ -83,12 +83,19 @@ class DBMutantContainerIterator
     private:
         int CurrentId;
         sqlite3 * DB;
+        int Count;
+        int Pos; 
     public:
         DBMutantContainerIterator(const string& DBName)
         {
             int db = sqlite3_open(DBName.c_str(), &DB);
+            Pos = 0;
         };
         void First();
+        void Next() { CurrentId++; Pos++;};
+        void GetCurrent();
+        int GetCount();
+        bool IsDone() const {return Pos>Count;}
 };
 
 class MutantContainer : public ScumContainer
