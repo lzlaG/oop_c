@@ -1,9 +1,8 @@
-#include <vector>
-#include <sqlite3.h>
-#include <string>
 #ifndef ScumH
 #define ScumH
-
+#include <vector>
+#include "sqlite3.h"
+#include <string>
 using namespace std;
 
 template<class Type>
@@ -78,36 +77,18 @@ class MutantContainerIterator : public Iterator<ScumPointer>
         bool IsDone() const { return Pos >= Count;}
         ScumPointer GetCurrent() const { return ScumCell[Pos];}
 };
-class DBMutantContainerIterator : public Iterator<ScumPointer>
-{
 
-};
-
-class DBMutantContainer //:public ScumContainer
+class DBMutantContainerIterator
 {
     private:
-        sqlite3* DB;
+        int CurrentId;
+        sqlite3 * DB;
     public:
-        DBMutantContainer(const string& DBName)
+        DBMutantContainerIterator(const string& DBName)
         {
             int db = sqlite3_open(DBName.c_str(), &DB);
-            if (db != SQLITE_OK)
-            {
-                cout << "Ошибка открытия базы данных!" << endl;
-            };
-            const char *createtable = "CREATE TABLE Mutants ("
-                "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                "MutantType VARCHAR(15),"
-                "StrengthOfHands VARCHAR(15),"
-                "StrengthOfLegs VARCHAR(15),"
-                "Age VARCHAR(15));";
-            char *errmsg;
-            sqlite3_exec( DB, createtable, NULL, NULL, &errmsg);
-            cout << errmsg << "\n";
         };
-        //virtual ~DBMutantContainer();
-        void AddMutant(ScumPointer newMutant);
-        //int GetCount();
+        void First();
 };
 
 class MutantContainer : public ScumContainer
@@ -284,5 +265,4 @@ class DecoratorType : public Decorator<ScumPointer>
             }while(!It->IsDone() && It->GetCurrent()->GetType()!= TargetType);
         }
 };
-
 #endif ScumH

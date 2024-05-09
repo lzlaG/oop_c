@@ -2,7 +2,7 @@
 #include <vector>
 #include <list>
 #include "main.h"
-#include <sqlite3.h>
+#include "sqlite3.h"
 
 using namespace std;
 
@@ -110,6 +110,16 @@ class WildMutantContainerIterator : public Iterator<ScumPointer>
         ScumPointer GetCurrent() const {return *it;}
 };
 
+void DBMutantContainerIterator::First()
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT id FROM Mutants ORDER BY id ASC LIMIT 1;";
+    int rc = sqlite3_prepare_v2(DB, sql, -1, &stmt, nullptr);
+    rc = sqlite3_step(stmt);
+    int id = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+    cout << "ID первой записи:" << id << "\n";
+};
 
 class WildMutantContainer : public ScumContainer
 {
@@ -123,10 +133,10 @@ class WildMutantContainer : public ScumContainer
             return new WildMutantContainerIterator(&ScumCell);
         };
 };
-
+/*
 string quotesql( const string& s ) {
     return string("'") + s + string("'");
-};
+};*/
 
 string PrintLegPower (const StregthOfLegs type)
 {
@@ -146,6 +156,12 @@ string PrintHandPower (const StregthOfHands type)
         case StregthOfHands::High: return "Мощные руки";
     }
 }
+/*
+void DBMutantContainer::ClearDB()
+{
+    char *errmsg;
+    sqlite3_exec(DB,"DELETE FROM Mutants", NULL, NULL, &errmsg);
+};
 
 void DBMutantContainer::AddMutant(ScumPointer newMutant)
 {
@@ -162,7 +178,7 @@ void DBMutantContainer::AddMutant(ScumPointer newMutant)
     sqlite3_exec(DB, query.c_str(), NULL, NULL, &errmsg);
     cout << errmsg << "\n";
 };
-
+*/
 void SelfSpec (ScumPointer currentMutant)
 {
     ;
@@ -212,14 +228,14 @@ Scum *MutantFactory(MutantType newMutant)
 int main()
 {
     srand(time(NULL));
+
     //MutantContainer scumcell(100);
-    DBMutantContainer scumcell("mydb.db");
-    scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
+    //WildMutantContainer scumcell;
+    DBMutantContainerIterator it("mydb.db");
+    it.First();
     /*
-    WildMutantContainer scumcell;
     int random_amount_of_mutant = random()%(100-10+1)+1;
     cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
-
     for (int i=0; i<=random_amount_of_mutant; i++)
     {
         scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
