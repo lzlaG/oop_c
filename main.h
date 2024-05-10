@@ -18,7 +18,7 @@ class Iterator
         virtual Type GetCurrent() const = 0;
 };
 
-enum class MutantType : int {Gargoyle, Wolfman, Vampire, Unknown};
+enum class MutantType : int {Gargoyle, Wolfman, Vampire};
 
 enum class StregthOfHands : int {High, Medium, Low};
 
@@ -37,9 +37,9 @@ class Scum
         Age AgeOfMutant;
         Scum()
         {
-            HandPower = GetRandomHandPower();
-            LegPower = GetRandomLegPower();
-            AgeOfMutant = GetRandomAge();
+            HandPower = StregthOfHands(rand()%3);
+            LegPower = StregthOfLegs(rand()%3);
+            AgeOfMutant = Age(rand()%3);
         };
     public:
         StregthOfHands GetHandPower() {return HandPower;};
@@ -76,26 +76,6 @@ class MutantContainerIterator : public Iterator<ScumPointer>
         void Next() { Pos++; }
         bool IsDone() const { return Pos >= Count;}
         ScumPointer GetCurrent() const { return ScumCell[Pos];}
-};
-
-class DBMutantContainerIterator
-{
-    private:
-        int CurrentId;
-        sqlite3 * DB;
-        int Count;
-        int Pos; 
-    public:
-        DBMutantContainerIterator(const string& DBName)
-        {
-            int db = sqlite3_open(DBName.c_str(), &DB);
-            Pos = 0;
-        };
-        void First();
-        void Next() { CurrentId++; Pos++;};
-        void GetCurrent();
-        int GetCount();
-        bool IsDone() const {return Pos>Count;}
 };
 
 class MutantContainer : public ScumContainer

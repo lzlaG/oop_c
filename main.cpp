@@ -6,45 +6,6 @@
 
 using namespace std;
 
-StregthOfHands GetRandomHandPower()
-{
-    switch (random()%3)
-    {
-        case 0:
-            return StregthOfHands::High;
-        case 1:
-            return StregthOfHands::Medium;
-        case 2:
-            return StregthOfHands::Low;
-    };
-};
-
-StregthOfLegs GetRandomLegPower()
-{
-    switch (random()%3)
-    {
-        case 0:
-            return StregthOfLegs::High;
-        case 1:
-            return StregthOfLegs::Medium;
-        case 2:
-            return StregthOfLegs::Low;
-    }; 
-};
-
-Age GetRandomAge()
-{
-    switch (random()%3)
-    {
-        case 0:
-            return Age::Young;
-        case 1:
-            return Age::Old;
-        case 2:
-            return Age::Newborn;
-    }; 
-};
-
 class Gargoyle : public Scum
 {
     public:
@@ -110,45 +71,6 @@ class WildMutantContainerIterator : public Iterator<ScumPointer>
         ScumPointer GetCurrent() const {return *it;}
 };
 
-int DBMutantContainerIterator::GetCount()
-{
-    sqlite3_stmt* stmt;
-    int result = sqlite3_prepare_v2(DB, "SELECT COUNT(*) FROM Mutants", -1, &stmt, 0);
-    result = sqlite3_step(stmt);
-    int count = sqlite3_column_int(stmt, 0);
-    Count = count;
-    return count;
-};
-
-void DBMutantContainerIterator::First()
-{
-    sqlite3_stmt *stmt;
-    const char *sql = "SELECT id FROM Mutants ORDER BY id ASC LIMIT 1;";
-    int rc = sqlite3_prepare_v2(DB, sql, -1, &stmt, nullptr);
-    rc = sqlite3_step(stmt);
-    CurrentId = sqlite3_column_int(stmt, 0);
-    sqlite3_finalize(stmt);
-    cout << "ID первой записи:" << CurrentId << "\n";
-};
-
-void DBMutantContainerIterator::GetCurrent()
-{
-    sqlite3_stmt* pStmt = nullptr;
-    string outStr;
-    string sql2("SELECT `StrengthOfHands` FROM `Mutants` WHERE `ID` = ?1;");
-    int result = sqlite3_prepare_v2(DB, sql2.c_str(), -1, &pStmt, nullptr);
-    if (result != SQLITE_OK) {
-        cout << "Prepare error\n";
-    };
-    result = sqlite3_bind_int(pStmt, 1 /*?1*/, CurrentId);
-    if (result != SQLITE_OK) {
-        cout << "Bind text error\n";
-    };
-    result = sqlite3_step(pStmt);
-    outStr.assign(reinterpret_cast<const char*>(sqlite3_column_text(pStmt, 0)));
-    cout << "Result:" << outStr << "\n";
-};
-
 class WildMutantContainer : public ScumContainer
 {
     private:
@@ -161,10 +83,6 @@ class WildMutantContainer : public ScumContainer
             return new WildMutantContainerIterator(&ScumCell);
         };
 };
-/*
-string quotesql( const string& s ) {
-    return string("'") + s + string("'");
-};*/
 
 string PrintLegPower (const StregthOfLegs type)
 {
@@ -184,29 +102,7 @@ string PrintHandPower (const StregthOfHands type)
         case StregthOfHands::High: return "Мощные руки";
     }
 }
-/*
-void DBMutantContainer::ClearDB()
-{
-    char *errmsg;
-    sqlite3_exec(DB,"DELETE FROM Mutants", NULL, NULL, &errmsg);
-};
 
-void DBMutantContainer::AddMutant(ScumPointer newMutant)
-{
-    string mutanttype = PrintMutantType(newMutant->GetType());
-    string handpower = PrintHandPower(newMutant->GetHandPower());
-    string legpower = PrintLegPower(newMutant->GetLegPower());
-    string ageofmutant = PrintAgeOfMutant(newMutant->GetAgeOfMutant());
-    string query = "INSERT INTO Mutants (MutantType, StrengthOfHands, StrengthOfLegs, Age) VALUES ("
-    +quotesql(mutanttype)+","
-    +quotesql(handpower)+","
-    +quotesql(legpower)+","
-    +quotesql(ageofmutant)+");";
-    char *errmsg;
-    sqlite3_exec(DB, query.c_str(), NULL, NULL, &errmsg);
-    cout << errmsg << "\n";
-};
-*/
 void SelfSpec (ScumPointer currentMutant)
 {
     ;
@@ -238,7 +134,7 @@ void ItogTask(Iterator<ScumPointer> *it)
         cout << PrintMutantType(currentMutant->GetType()) << "\n";
         cout << PrintHandPower(currentMutant->GetHandPower()) << "\n";
         cout << PrintLegPower(currentMutant->GetLegPower()) << "\n";
-        PrintAgeOfMutant(currentMutant->GetAgeOfMutant());
+        cout << PrintAgeOfMutant(currentMutant->GetAgeOfMutant()) << "\n";
 
     }
 }
@@ -258,13 +154,8 @@ int main()
     srand(time(NULL));
 
     //MutantContainer scumcell(100);
-    //WildMutantContainer scumcell;
-    DBMutantContainerIterator it("mydb.db");
-    it.First();
-    it.GetCurrent();
-    cout << it.GetCount() << "\n";
-    cout << it.IsDone() << "\n";
-    /*
+    WildMutantContainer scumcell;
+    
     int random_amount_of_mutant = random()%(100-10+1)+1;
     cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
     for (int i=0; i<=random_amount_of_mutant; i++)
@@ -295,6 +186,5 @@ int main()
                 break;
         }
     }
-    //Kill_vampires(it);
-    */
+    //Kill_vampires(it);*/
 };
