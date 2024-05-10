@@ -10,7 +10,6 @@ class Gargoyle : public Scum
 {
     public:
         MutantType GetType() const {return MutantType::Gargoyle;};
-        void Fly(int x) const {cout << "Горгулья пролетела " << x << " км" << endl;}
         void Summon()   const { cout << " Призвали горгулью " << endl;};
         void Kill() const { cout << " убили горгулью " << endl;};
 };
@@ -19,7 +18,6 @@ class Wolfman : public Scum
 {
     public:
         MutantType GetType() const {return MutantType::Wolfman;};
-        void Run(int x) { cout << "Оборотень пробежал " << x << " км " << endl;}
         void Summon() const { cout << " Призвали оборотня " << "\n";};
         void Kill() const { cout << " убили оборотня " << "\n";};
 };
@@ -28,7 +26,6 @@ class Vampire : public Scum
 {
     public:
         MutantType GetType() const {return MutantType::Vampire;}
-        void Blood(int x) {cout << "Вампир выпил " << x << " литров крови " << endl;}
         void Summon() const { cout << " Призвали вампира " << "\n";}
         void Kill() const { cout << " убили вампира" << "\n";}
 };
@@ -40,7 +37,6 @@ string PrintMutantType(const MutantType type)
 		case MutantType::Gargoyle: return  "ГОРГУЛЬЯ";
 		case MutantType::Vampire: return  "ВАМПИР";
 		case MutantType::Wolfman: return  "ОБОРОТЕНЬ";
-		default: return "неизвестный";
 	}
 };
 
@@ -103,39 +99,16 @@ string PrintHandPower (const StregthOfHands type)
     }
 }
 
-void SelfSpec (ScumPointer currentMutant)
-{
-    ;
-    int x = random()%(5000-10+1)+1;
-    if(currentMutant->GetType() == MutantType::Wolfman)
-    {
-        Wolfman* wolfman = dynamic_cast<Wolfman*>(currentMutant);
-        wolfman->Run(x);
-    }
-    if (currentMutant->GetType() == MutantType::Vampire)
-    {
-        Vampire* vampire = dynamic_cast<Vampire*>(currentMutant);
-        vampire->Blood(x);
-    }
-    if (currentMutant->GetType() == MutantType::Gargoyle)
-    {
-        Gargoyle* gargoyle = dynamic_cast<Gargoyle*>(currentMutant);
-        gargoyle->Fly(x);
-    }
-}
-
 void ItogTask(Iterator<ScumPointer> *it)
 {
     for(it->First(); !it->IsDone(); it->Next())
     {
-        const ScumPointer currentMutant = it->GetCurrent();
-        //SelfSpec(currentMutant); 
+        const ScumPointer currentMutant = it->GetCurrent(); 
         cout << "----------------------------------" << "\n";
         cout << PrintMutantType(currentMutant->GetType()) << "\n";
         cout << PrintHandPower(currentMutant->GetHandPower()) << "\n";
         cout << PrintLegPower(currentMutant->GetLegPower()) << "\n";
         cout << PrintAgeOfMutant(currentMutant->GetAgeOfMutant()) << "\n";
-
     }
 }
 
@@ -165,26 +138,6 @@ int main()
     Iterator<ScumPointer> *it =  scumcell.GetIterator();
     //PrintMutantType()
     Iterator<ScumPointer> *sorting_it = new DecoratorAge(it, Age::Old);
-    for(;;)
-    {
-        int choise;
-        cout << "Вывести отсортированный или нет?(1,2-выбор вывода 3-выход)" << "\n";
-        cin >> choise;
-        if (choise == 3)
-        {
-            break;
-        }
-        switch(choise)
-        {
-            case 1:
-                cout << "Вывод отсортированного " << "\n";
-                ItogTask(sorting_it);
-                break;
-            case 2:
-                cout << "Вывод несортированного " << "\n";
-                ItogTask(it);
-                break;
-        }
-    }
+    ItogTask(sorting_it);
     //Kill_vampires(it);*/
 };
