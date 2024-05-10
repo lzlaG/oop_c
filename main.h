@@ -56,10 +56,10 @@ class ScumContainer
 {
     public:
         virtual void AddMutant(ScumPointer newMutant) = 0;
-        virtual int GetCount() const = 0;
+        virtual int GetCount() = 0;
 };
 
-class UltraWildContainerIterator : public Iterator<ScumPointer>
+class UltraWildMutantContainerIterator : public Iterator<ScumPointer>
 {
     private:
         sqlite3* DB;
@@ -67,10 +67,11 @@ class UltraWildContainerIterator : public Iterator<ScumPointer>
         int Count;
         int Pos;
     public:
-        UltraWildContainerIterator(sqlite3* db)
+        UltraWildMutantContainerIterator(sqlite3* db, int count)
         {
             DB = db;
             Pos = 0;
+            Count = count;
         };
         void First();
         void Next()
@@ -82,6 +83,43 @@ class UltraWildContainerIterator : public Iterator<ScumPointer>
         ScumPointer GetCurrent();
 };
 
+class UltraWildMutantContainer : public ScumContainer
+{
+    private:
+        sqlite3* DB;
+        int MutantCountInDB;
+    public:
+        UltraWildMutantContainer(const string& DB_path)
+        {
+            sqlite3_open(DB_path.c_str(), &DB);
+            string createtable = "CREATE TABLE Mutants ("
+                                "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                "MutantType INTEGER,"
+                                "StrengthOfHands INTEGER,"
+                                "StrengthOfLegs INTEGER,"
+                                "Age INTEGER"
+                                ");";
+            char *errMsg;
+            sqlite3_exec(DB, createtable.c_str(), nullptr, nullptr, &errMsg);
+            cout << errMsg << "\n";
+        }
+        void AddMutant(ScumPointer newMutant);
+        int GetCount() {
+            sqlite3_stmt* stmt;
+            int result = sqlite3_prepare_v2(DB, "SELECT COUNT(*) FROM Mutants", -1, &stmt, 0);
+            result = sqlite3_step(stmt);
+            int count = sqlite3_column_int(stmt, 0);
+            //MutantCountInDB = count;
+            sqlite3_finalize(stmt);
+            return count;
+        };
+        void ClearDB();
+        /*
+        Iterator<ScumPointer> * GetIterator()
+        {
+            return new UltraWildMutantContainerIterator(DB, );
+        };*/
+};
 // ------------------- container and iterator based on vector ------------------
 class WildMutantContainerIterator : public Iterator<ScumPointer>
 {
@@ -106,7 +144,7 @@ class WildMutantContainer : public ScumContainer
         vector<ScumPointer> ScumCell;
     public:
         void AddMutant(ScumPointer newMutant) {ScumCell.push_back(newMutant);}
-        int GetCount() const {return ScumCell.size();}
+        int GetCount() {return ScumCell.size();}
         Iterator<ScumPointer> *GetIterator()
         {
             return new WildMutantContainerIterator(&ScumCell);
@@ -144,7 +182,7 @@ class MutantContainer : public ScumContainer
         virtual ~MutantContainer();
         void AddMutant(ScumPointer newMutant);
         int GetCount() const {return MutantCount; };
-        ScumPointer GetByIndex(int index) const {return ScumCell[index];}
+        ScumPointer GetByIndex(int index) {return ScumCell[index];}
         Iterator<ScumPointer> * GetIterator()
         {
             return new MutantContainerIterator(ScumCell, MutantCount);

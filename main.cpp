@@ -31,6 +31,37 @@ class Vampire : public Scum
         void Kill() const { cout << " убили вампира" << "\n";}
 };
 
+// -------- functions for container and iterator based on sqlite ----
+void UltraWildMutantContainer::ClearDB()
+{
+    char *errmsg;
+    sqlite3_exec(DB,"DELETE FROM Mutants", NULL, NULL, &errmsg);
+};
+void UltraWildMutantContainer::AddMutant(ScumPointer newMutant)
+{
+    int mutanttype;
+    MutantType type_of_mutant = newMutant->GetType();
+    switch(type_of_mutant)
+    {
+        case MutantType::Gargoyle: mutanttype=0;
+        case MutantType::Wolfman: mutanttype=1;
+        case MutantType::Vampire: mutanttype=2;
+    }; 
+    int handpower = rand()%3;
+    int legpower = rand()%3;
+    int ageofmutant = rand()%3;
+    sqlite3_stmt* stmt;
+    string insert_query = "INSERT INTO Mutants (MutantType,StrengthOfHands,StrengthOfLegs, Age)"
+                            "VALUES (:mutanttype,:power_of_hands,:power_of_legs, :age);";
+    sqlite3_prepare_v2(DB, insert_query.c_str(), -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, sqlite3_bind_parameter_index(stmt, ":mutanttype"), mutanttype);
+    sqlite3_bind_int(stmt, sqlite3_bind_parameter_index(stmt, ":power_of_hands"), handpower);
+    sqlite3_bind_int(stmt, sqlite3_bind_parameter_index(stmt, ":power_of_legs"), legpower);
+    sqlite3_bind_int(stmt, sqlite3_bind_parameter_index(stmt, ":age"), ageofmutant);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+};
+
 //--------- functions for container based on list -------------- 
 void MutantContainer::AddMutant(ScumPointer newMutant)
 {
@@ -103,7 +134,7 @@ string PrintHandPower (const StregthOfHands type)
     }
 }
 
-// --------- function for itog task --------------
+// --------- function for task --------------
 void ItogTask(Iterator<ScumPointer> *it)
 {
     for(it->First(); !it->IsDone(); it->Next())
@@ -133,13 +164,16 @@ int main()
     srand(time(NULL));
 
     //MutantContainer scumcell(100);
-    WildMutantContainer scumcell;
+    //WildMutantContainer scumcell;
+    UltraWildMutantContainer scumcell("mutant.db");
+    scumcell.ClearDB();
     int random_amount_of_mutant = random()%(100-10+1)+1;
     cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
-    for (int i=0; i<=random_amount_of_mutant; i++)
+    for (int i=0; i<random_amount_of_mutant; i++)
     {
         scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
     };
+    /*
     Iterator<ScumPointer> *it =  scumcell.GetIterator();
     //PrintMutantType()
     Iterator<ScumPointer> *sorting_it = new DecoratorAge(it, Age::Old);
