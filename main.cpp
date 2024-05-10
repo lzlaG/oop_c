@@ -198,10 +198,8 @@ int main()
     {
         scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
     };
-    /*
+    scumcell.GetCount();
     Iterator<ScumPointer> *it =  scumcell.GetIterator();
-    //PrintMutantType()
-    Iterator<ScumPointer> *sorting_it = new DecoratorAge(it, Age::Old);
-    ItogTask(sorting_it);
+    ItogTask(it);
     //Kill_vampires(it);*/
 };

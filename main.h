@@ -15,7 +15,7 @@ class Iterator
         virtual void First() = 0 ;
         virtual void Next() = 0;
         virtual bool IsDone() const = 0;
-        virtual Type GetCurrent() const = 0;
+        virtual Type GetCurrent() = 0;
 };
 
 enum class MutantType : int {Gargoyle, Wolfman, Vampire};
@@ -107,16 +107,15 @@ class UltraWildMutantContainer : public ScumContainer
             int result = sqlite3_prepare_v2(DB, "SELECT COUNT(*) FROM Mutants", -1, &stmt, 0);
             result = sqlite3_step(stmt);
             int count = sqlite3_column_int(stmt, 0);
-            //MutantCountInDB = count;
+            MutantCountInDB = count;
             sqlite3_finalize(stmt);
             return count;
         };
         void ClearDB();
-        /*
         Iterator<ScumPointer> * GetIterator()
         {
-            return new UltraWildMutantContainerIterator(DB, );
-        };*/
+            return new UltraWildMutantContainerIterator(DB, MutantCountInDB);
+        };
 };
 // ------------------- container and iterator based on vector ------------------
 class WildMutantContainerIterator : public Iterator<ScumPointer>
@@ -133,7 +132,7 @@ class WildMutantContainerIterator : public Iterator<ScumPointer>
         void First() { it = ScumCell->begin();}
         void Next() {it++;}
         bool IsDone() const {return it == ScumCell->end();}
-        ScumPointer GetCurrent() const {return *it;}
+        ScumPointer GetCurrent() {return *it;}
 };
 
 class WildMutantContainer : public ScumContainer
@@ -166,7 +165,7 @@ class MutantContainerIterator : public Iterator<ScumPointer>
         void First() { Pos = 0; }
         void Next() { Pos++; }
         bool IsDone() const { return Pos >= Count;}
-        ScumPointer GetCurrent() const { return ScumCell[Pos];}
+        ScumPointer GetCurrent() { return ScumCell[Pos];}
 };
 
 class MutantContainer : public ScumContainer
