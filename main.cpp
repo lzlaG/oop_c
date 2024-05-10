@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// -------------- define classes ---------------
 class Gargoyle : public Scum
 {
     public:
@@ -30,56 +31,38 @@ class Vampire : public Scum
         void Kill() const { cout << " убили вампира" << "\n";}
 };
 
-string PrintMutantType(const MutantType type)
+//--------- functions for container based on list -------------- 
+void MutantContainer::AddMutant(ScumPointer newMutant)
 {
-    switch(type)
-	{
-		case MutantType::Gargoyle: return  "ГОРГУЛЬЯ";
-		case MutantType::Vampire: return  "ВАМПИР";
-		case MutantType::Wolfman: return  "ОБОРОТЕНЬ";
-	}
-};
+    ScumCell[MutantCount] = newMutant;
+    MutantCount++;
+}
 
-string PrintAgeOfMutant(const Age type)
+MutantContainer::MutantContainer(int maxSize)
 {
-    switch(type)
+    ScumCell = new ScumPointer[maxSize];
+    for (int i = 0; i<maxSize; i++)
     {
-        case Age::Old: return "ПОЖИЛОЙ";
-        case Age::Young: return "МОЛОДОЙ";
-        case Age::Newborn: return "Новорожденный";
-    }
+        ScumCell[i] = NULL;
+    };
+    MutantCount = 0;
+    MaxSize = maxSize;
 };
 
-class WildMutantContainerIterator : public Iterator<ScumPointer>
+MutantContainer::~MutantContainer()
 {
-    private:
-        const vector<ScumPointer> * ScumCell;
-        vector<ScumPointer>::const_iterator it;
-    public:
-        WildMutantContainerIterator (const vector<ScumPointer> * scumcell)
+    for (int i = 0; i<MaxSize; i++)
+    {
+        if( ScumCell[i] != NULL)
         {
-            ScumCell = scumcell;
-            it = ScumCell->begin();
-        }
-        void First() { it = ScumCell->begin();}
-        void Next() {it++;}
-        bool IsDone() const {return it == ScumCell->end();}
-        ScumPointer GetCurrent() const {return *it;}
-};
-
-class WildMutantContainer : public ScumContainer
-{
-    private:
-        vector<ScumPointer> ScumCell;
-    public:
-        void AddMutant(ScumPointer newMutant) {ScumCell.push_back(newMutant);}
-        int GetCount() const {return ScumCell.size();}
-        Iterator<ScumPointer> *GetIterator()
-        {
-            return new WildMutantContainerIterator(&ScumCell);
+            delete ScumCell[i];
+            ScumCell[i] = NULL;
         };
+    };
+    delete[] ScumCell;
 };
 
+// --------- prints of parametrs -------------------
 string PrintLegPower (const StregthOfLegs type)
 {
     switch (type)
@@ -89,6 +72,27 @@ string PrintLegPower (const StregthOfLegs type)
         case StregthOfLegs::High: return "Сильные ноги";
     }
 }
+
+string PrintMutantType(const MutantType type)
+{
+    switch(type)
+	{
+		case MutantType::Gargoyle: return  "ГОРГУЛЬЯ";
+		case MutantType::Vampire: return  "ВАМПИР";
+		case MutantType::Wolfman: return  "ОБОРОТЕНЬ";
+	}
+}
+
+string PrintAgeOfMutant(const Age type)
+{
+    switch(type)
+    {
+        case Age::Old: return "ПОЖИЛОЙ";
+        case Age::Young: return "МОЛОДОЙ";
+        case Age::Newborn: return "Новорожденный";
+    }
+}
+
 string PrintHandPower (const StregthOfHands type)
 {
     switch (type)
@@ -99,6 +103,7 @@ string PrintHandPower (const StregthOfHands type)
     }
 }
 
+// --------- function for itog task --------------
 void ItogTask(Iterator<ScumPointer> *it)
 {
     for(it->First(); !it->IsDone(); it->Next())
@@ -112,6 +117,7 @@ void ItogTask(Iterator<ScumPointer> *it)
     }
 }
 
+// ----------- factory method ---------------
 Scum *MutantFactory(MutantType newMutant)
 {
     switch(newMutant)
@@ -128,7 +134,6 @@ int main()
 
     //MutantContainer scumcell(100);
     WildMutantContainer scumcell;
-    
     int random_amount_of_mutant = random()%(100-10+1)+1;
     cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
     for (int i=0; i<=random_amount_of_mutant; i++)

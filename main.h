@@ -59,6 +59,61 @@ class ScumContainer
         virtual int GetCount() const = 0;
 };
 
+class UltraWildContainerIterator : public Iterator<ScumPointer>
+{
+    private:
+        sqlite3* DB;
+        int CurrentId;
+        int Count;
+        int Pos;
+    public:
+        UltraWildContainerIterator(sqlite3* db)
+        {
+            DB = db;
+            Pos = 0;
+        };
+        void First();
+        void Next()
+        {
+            CurrentId++;
+            Pos++;
+        };
+        bool IsDone() const {return Pos>= Count;};
+        ScumPointer GetCurrent();
+};
+
+// ------------------- container and iterator based on vector ------------------
+class WildMutantContainerIterator : public Iterator<ScumPointer>
+{
+    private:
+        const vector<ScumPointer> * ScumCell;
+        vector<ScumPointer>::const_iterator it;
+    public:
+        WildMutantContainerIterator (const vector<ScumPointer> * scumcell)
+        {
+            ScumCell = scumcell;
+            it = ScumCell->begin();
+        }
+        void First() { it = ScumCell->begin();}
+        void Next() {it++;}
+        bool IsDone() const {return it == ScumCell->end();}
+        ScumPointer GetCurrent() const {return *it;}
+};
+
+class WildMutantContainer : public ScumContainer
+{
+    private:
+        vector<ScumPointer> ScumCell;
+    public:
+        void AddMutant(ScumPointer newMutant) {ScumCell.push_back(newMutant);}
+        int GetCount() const {return ScumCell.size();}
+        Iterator<ScumPointer> *GetIterator()
+        {
+            return new WildMutantContainerIterator(&ScumCell);
+        };
+};
+
+//------------------ container and iterator based on list -------------------------
 class MutantContainerIterator : public Iterator<ScumPointer>
 {
     private:
@@ -95,37 +150,6 @@ class MutantContainer : public ScumContainer
             return new MutantContainerIterator(ScumCell, MutantCount);
         };
 };
-
-void MutantContainer::AddMutant(ScumPointer newMutant)
-{
-    ScumCell[MutantCount] = newMutant;
-    MutantCount++;
-}
-
-MutantContainer::MutantContainer(int maxSize)
-{
-    ScumCell = new ScumPointer[maxSize];
-    for (int i = 0; i<maxSize; i++)
-    {
-        ScumCell[i] = NULL;
-    };
-    MutantCount = 0;
-    MaxSize = maxSize;
-};
-
-MutantContainer::~MutantContainer()
-{
-    for (int i = 0; i<MaxSize; i++)
-    {
-        if( ScumCell[i] != NULL)
-        {
-            delete ScumCell[i];
-            ScumCell[i] = NULL;
-        };
-    };
-    delete[] ScumCell;
-};
-
 
 template<class Type>
 class Decorator : public Iterator<Type>
