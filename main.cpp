@@ -212,8 +212,8 @@ int main()
     {
         scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
     };
-    Iterator<ScumPointer> *it =  scumcell.GetIterator();
-    
+    Iterator<ScumPointer> *it =  new DecoratorLegPower( 
+                                new DecoratorAge( new DecoratorType(scumcell.GetIterator(), MutantType::Vampire),Age::Old), StregthOfLegs::High);
     //it->First();
     ItogTask(it);
     //Kill_vampires(it);*/

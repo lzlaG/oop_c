@@ -188,7 +188,7 @@ class Decorator : public Iterator<Type>
         void First() {It->First();}
         void Next() {It->Next();}
         bool IsDone() const {return It->IsDone();}
-        Type GetCurrent() const { return It->GetCurrent(); }
+        Type GetCurrent() { return It->GetCurrent(); }
 };
 
 class DecoratorLegPower : public Decorator<ScumPointer>
