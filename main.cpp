@@ -21,7 +21,7 @@ class Gargoyle : public Scum
 class Wolfman : public Scum
 {
     public:
-        Wolfman() : Scum()
+        Wolfman(int id_of_hand = rand()%3, int id_of_leg = rand()%3, int id_of_age = rand()%3 ) : Scum(id_of_hand,id_of_leg,id_of_age)
         {
             TypeOfMutant = MutantType::Wolfman;
         }
@@ -32,7 +32,7 @@ class Wolfman : public Scum
 class Vampire : public Scum
 {
     public:
-        Vampire() : Scum()
+        Vampire(int id_of_hand = rand()%3, int id_of_leg = rand()%3, int id_of_age = rand()%3 ) : Scum(id_of_hand,id_of_leg,id_of_age)
         {
             TypeOfMutant = MutantType::Vampire;
         }
@@ -62,28 +62,42 @@ void UltraWildMutantContainer::AddMutant(ScumPointer newMutant)
     sqlite3_bind_int(stmt, sqlite3_bind_parameter_index(stmt, ":age"), ageofmutant);
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
+    MutantCountInDB++;
 };
 
 //-------- functions for iterator based on sqlite container ---------
-void UltraWildMutantContainerIterator::First()
+ScumPointer UltraWildMutantContainerIterator::GetCurrent()
 {
-    sqlite3_stmt *stmt;
+    
+    sqlite3_stmt* stmt;
+    
     const char *sql = "SELECT ID FROM Mutants ORDER BY ID ASC LIMIT 1;";
     int rc = sqlite3_prepare_v2(DB, sql, -1, &stmt, nullptr);
     rc = sqlite3_step(stmt);
-    CurrentId = sqlite3_column_int(stmt, 0);
+    FirstId = sqlite3_column_int(stmt, 0);
     sqlite3_finalize(stmt);
-};
-
-ScumPointer UltraWildMutantContainerIterator::GetCurrent()
-{
-    /*sqlite3_stmt* stmt;
-    const char *get_data = "SELECT (MutantType,StrengthOfHands,StrengthOfLegs,Age) FROM Mutants WHERE ID = ?;";
-    int rc = sqlite3_prepare_v2(DB, get_data, -1, &stmt, nullptr);
-    sqlite3_bind_int(stmt, 1, CurrentId);
+    ScumPointer current;
+    int needed_id = FirstId+PosDB;
+    const char *get_data = "SELECT MutantType,StrengthOfHands,StrengthOfLegs,Age FROM Mutants WHERE ID = ?;";
+    rc = sqlite3_prepare_v2(DB, get_data, -1, &stmt, nullptr);
+    sqlite3_bind_int(stmt, 1, needed_id);
     rc = sqlite3_step(stmt);
-    int id_of_mutant = sqlite3_column_int(stmt,0);*/
-    ScumPointer current = new Gargoyle(1,1,1);
+    int id_of_mutant = sqlite3_column_int(stmt,0);
+    int hand_id = sqlite3_column_int(stmt,1);
+    int leg_id = sqlite3_column_int(stmt, 2);
+    int age_id = sqlite3_column_int(stmt, 3);
+    switch(id_of_mutant)
+    {
+        case 0:
+            current = new Gargoyle(hand_id,leg_id,age_id);
+            break;
+        case 1:
+            current = new Wolfman(hand_id,leg_id,age_id);
+            break;
+        case 2:
+            current = new Vampire(hand_id,leg_id,age_id);
+            break;
+    }
     return current;
 };
 
@@ -164,7 +178,7 @@ void ItogTask(Iterator<ScumPointer> *it)
 {
     for(it->First(); !it->IsDone(); it->Next())
     {
-        const ScumPointer currentMutant = it->GetCurrent(); 
+        const ScumPointer currentMutant = it->GetCurrent();
         cout << "----------------------------------" << "\n";
         cout << PrintMutantType(currentMutant->GetType()) << "\n";
         cout << PrintHandPower(currentMutant->GetHandPower()) << "\n";
@@ -198,8 +212,9 @@ int main()
     {
         scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
     };
-    scumcell.GetCount();
     Iterator<ScumPointer> *it =  scumcell.GetIterator();
+    
+    //it->First();
     ItogTask(it);
     //Kill_vampires(it);*/
 };

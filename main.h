@@ -61,23 +61,18 @@ class UltraWildMutantContainerIterator : public Iterator<ScumPointer>
 {
     private:
         sqlite3* DB;
-        int CurrentId;
+        int FirstId;
         int Count;
-        int Pos;
+        int PosDB;
     public:
         UltraWildMutantContainerIterator(sqlite3* db, int count)
         {
             DB = db;
-            Pos = 0;
             Count = count;
         };
-        void First();
-        void Next()
-        {
-            CurrentId++;
-            Pos++;
-        };
-        bool IsDone() const {return Pos>= Count;};
+        void First() {PosDB = 0;};
+        void Next() {PosDB+=1;}
+        bool IsDone() const {return PosDB >= Count;};
         ScumPointer GetCurrent();
 };
 
@@ -100,17 +95,10 @@ class UltraWildMutantContainer : public ScumContainer
             char *errMsg;
             sqlite3_exec(DB, createtable.c_str(), nullptr, nullptr, &errMsg);
             cout << errMsg << "\n";
+            MutantCountInDB = 0;
         }
         void AddMutant(ScumPointer newMutant);
-        int GetCount() {
-            sqlite3_stmt* stmt;
-            int result = sqlite3_prepare_v2(DB, "SELECT COUNT(*) FROM Mutants", -1, &stmt, 0);
-            result = sqlite3_step(stmt);
-            int count = sqlite3_column_int(stmt, 0);
-            MutantCountInDB = count;
-            sqlite3_finalize(stmt);
-            return count;
-        };
+        int GetCount() { return MutantCountInDB;}
         void ClearDB();
         Iterator<ScumPointer> * GetIterator()
         {
@@ -255,7 +243,6 @@ class DecoratorHandsPower : public Decorator<ScumPointer>
 
             }while(!It->IsDone() && It->GetCurrent()->GetHandPower()!= TargetHands);
         }
-
 };
 
 class DecoratorAge : public Decorator<ScumPointer>
