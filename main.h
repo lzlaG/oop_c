@@ -26,28 +26,26 @@ enum class StregthOfLegs : int {High, Medium, Low};
 
 enum class Age : int {Old, Young, Newborn};
 
-StregthOfHands GetRandomHandPower();
-StregthOfLegs GetRandomLegPower();
-Age GetRandomAge();
 class Scum
 {
     protected:
         StregthOfHands HandPower;
         StregthOfLegs LegPower;
         Age AgeOfMutant;
-        Scum()
+        MutantType TypeOfMutant;
+        Scum(int id_of_hand = rand()%3, int id_of_leg = rand()%3, int id_of_age = rand()%3)
         {
-            HandPower = StregthOfHands(rand()%3);
-            LegPower = StregthOfLegs(rand()%3);
-            AgeOfMutant = Age(rand()%3);
+            HandPower = StregthOfHands(id_of_hand);
+            LegPower = StregthOfLegs(id_of_leg);
+            AgeOfMutant = Age(id_of_age);
         };
     public:
+        MutantType GetType() const {return TypeOfMutant;};
         StregthOfHands GetHandPower() {return HandPower;};
         StregthOfLegs GetLegPower() {return LegPower;};
         Age GetAgeOfMutant() {return AgeOfMutant;};
         virtual void Summon() const = 0;
         virtual void Kill() const = 0;
-        virtual MutantType GetType() const = 0;
 };
 
 typedef Scum * ScumPointer;

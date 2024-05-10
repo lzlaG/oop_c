@@ -10,7 +10,10 @@ using namespace std;
 class Gargoyle : public Scum
 {
     public:
-        MutantType GetType() const {return MutantType::Gargoyle;};
+        Gargoyle(int id_of_hand = rand()%3, int id_of_leg = rand()%3, int id_of_age = rand()%3 ) : Scum(id_of_hand,id_of_leg,id_of_age)
+        {
+            TypeOfMutant = MutantType::Gargoyle;
+        };
         void Summon()   const { cout << " Призвали горгулью " << endl;};
         void Kill() const { cout << " убили горгулью " << endl;};
 };
@@ -18,7 +21,10 @@ class Gargoyle : public Scum
 class Wolfman : public Scum
 {
     public:
-        MutantType GetType() const {return MutantType::Wolfman;};
+        Wolfman() : Scum()
+        {
+            TypeOfMutant = MutantType::Wolfman;
+        }
         void Summon() const { cout << " Призвали оборотня " << "\n";};
         void Kill() const { cout << " убили оборотня " << "\n";};
 };
@@ -26,12 +32,15 @@ class Wolfman : public Scum
 class Vampire : public Scum
 {
     public:
-        MutantType GetType() const {return MutantType::Vampire;}
+        Vampire() : Scum()
+        {
+            TypeOfMutant = MutantType::Vampire;
+        }
         void Summon() const { cout << " Призвали вампира " << "\n";}
         void Kill() const { cout << " убили вампира" << "\n";}
 };
 
-// -------- functions for container and iterator based on sqlite ----
+// -------- functions for container based on sqlite ----
 void UltraWildMutantContainer::ClearDB()
 {
     char *errmsg;
@@ -39,17 +48,10 @@ void UltraWildMutantContainer::ClearDB()
 };
 void UltraWildMutantContainer::AddMutant(ScumPointer newMutant)
 {
-    int mutanttype;
-    MutantType type_of_mutant = newMutant->GetType();
-    switch(type_of_mutant)
-    {
-        case MutantType::Gargoyle: mutanttype=0;
-        case MutantType::Wolfman: mutanttype=1;
-        case MutantType::Vampire: mutanttype=2;
-    }; 
-    int handpower = rand()%3;
-    int legpower = rand()%3;
-    int ageofmutant = rand()%3;
+    int mutanttype = (int)newMutant->GetType(); 
+    int handpower = (int)newMutant->GetHandPower();
+    int legpower = (int)newMutant->GetLegPower();
+    int ageofmutant = (int)newMutant->GetAgeOfMutant();
     sqlite3_stmt* stmt;
     string insert_query = "INSERT INTO Mutants (MutantType,StrengthOfHands,StrengthOfLegs, Age)"
                             "VALUES (:mutanttype,:power_of_hands,:power_of_legs, :age);";
@@ -60,6 +62,29 @@ void UltraWildMutantContainer::AddMutant(ScumPointer newMutant)
     sqlite3_bind_int(stmt, sqlite3_bind_parameter_index(stmt, ":age"), ageofmutant);
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
+};
+
+//-------- functions for iterator based on sqlite container ---------
+void UltraWildMutantContainerIterator::First()
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT ID FROM Mutants ORDER BY ID ASC LIMIT 1;";
+    int rc = sqlite3_prepare_v2(DB, sql, -1, &stmt, nullptr);
+    rc = sqlite3_step(stmt);
+    CurrentId = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+};
+
+ScumPointer UltraWildMutantContainerIterator::GetCurrent()
+{
+    /*sqlite3_stmt* stmt;
+    const char *get_data = "SELECT (MutantType,StrengthOfHands,StrengthOfLegs,Age) FROM Mutants WHERE ID = ?;";
+    int rc = sqlite3_prepare_v2(DB, get_data, -1, &stmt, nullptr);
+    sqlite3_bind_int(stmt, 1, CurrentId);
+    rc = sqlite3_step(stmt);
+    int id_of_mutant = sqlite3_column_int(stmt,0);*/
+    ScumPointer current = new Gargoyle(1,1,1);
+    return current;
 };
 
 //--------- functions for container based on list -------------- 
