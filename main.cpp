@@ -198,20 +198,66 @@ Scum *MutantFactory(MutantType newMutant)
     }
 }
 
+// ----------- function for add mutants to container
+template<typename T>
+void Add_Mutants_To_Container(T scumcell, int amount_of_mutant)
+{
+        for (int i=0; i<amount_of_mutant; i++)
+        {
+            scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
+        };
+}
+// ---------- function for iterator choose------
+Iterator<ScumPointer> *User_Iterator_and_Container_Choice_And_Fill_It(int user_choice, int amount_of_mutant)
+{
+    if (user_choice == 1)
+    {
+        MutantContainer scumcell_list(amount_of_mutant+1);
+        Add_Mutants_To_Container(scumcell_list, amount_of_mutant);
+        Iterator<ScumPointer> *it_list = scumcell_list.GetIterator();
+        return it_list;
+    };
+    if (user_choice == 2)
+    {
+        WildMutantContainer scumcell_vector;
+        Add_Mutants_To_Container(scumcell_vector, amount_of_mutant);
+        Iterator<ScumPointer> *it_vector = scumcell_vector.GetIterator();
+        return it_vector;
+    };
+    if (user_choice == 3)
+    {
+        string path_to_db;
+        cout << "Введите путь до базы данных: ";
+        cin >> path_to_db;
+        UltraWildMutantContainer scumcell_sqlite(path_to_db);
+        scumcell_sqlite.ClearDB();
+        Add_Mutants_To_Container(scumcell_sqlite, amount_of_mutant);
+        Iterator<ScumPointer> *it_sqlite = scumcell_sqlite.GetIterator();
+        return it_sqlite;
+    };
+};
+
 int main()
 {
     srand(time(NULL));
-    //WildMutantContainer scumcell;
-    //UltraWildMutantContainer scumcell("mutant.db");
-    //scumcell.ClearDB();
-    int random_amount_of_mutant = random()%(100-10+1)+1;
-    cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
-    MutantContainer scumcell(random_amount_of_mutant);
-    for (int i=0; i<random_amount_of_mutant; i++)
+    int user_choice;
+    for(;;)
     {
-        scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
+        cout << "Выберите тип контейнера: \n";
+        cout << "1. Массив\n";
+        cout << "2. Вектор\n";
+        cout << "3. SQLITE\n";
+        cout << "4. Выйти из программы\n";
+        cout << "Ваш выбор: ";
+        cin >> user_choice;
+        if (user_choice == 4)
+        {
+            break;
+        };
+        int random_amount_of_mutant = random()%(100-10+1)+1;
+        cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
+        MutantContainer scumcell_list(100000);
+        Add_Mutants_To_Container(scumcell_list, random_amount_of_mutant);
+        //Iterator<ScumPointer> *OurIterator = User_Iterator_and_Container_Choice_And_Fill_It(user_choice, random_amount_of_mutant);
     };
-    Iterator<ScumPointer> *it =  new DecoratorLegPower( 
-                                new DecoratorAge( new DecoratorType(scumcell.GetIterator(), MutantType::Vampire),Age::Old), StregthOfLegs::High);
-    ItogTask(it);
 };
