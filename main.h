@@ -166,7 +166,7 @@ class MutantContainer : public ScumContainer
         MutantContainer(int MaxSize);
         virtual ~MutantContainer();
         void AddMutant(ScumPointer newMutant);
-        int GetCount() const {return MutantCount; };
+        int GetCount() {return MutantCount; };
         ScumPointer GetByIndex(int index) {return ScumCell[index];}
         Iterator<ScumPointer> * GetIterator()
         {

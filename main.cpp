@@ -201,20 +201,17 @@ Scum *MutantFactory(MutantType newMutant)
 int main()
 {
     srand(time(NULL));
-
-    //MutantContainer scumcell(100);
     //WildMutantContainer scumcell;
-    UltraWildMutantContainer scumcell("mutant.db");
-    scumcell.ClearDB();
+    //UltraWildMutantContainer scumcell("mutant.db");
+    //scumcell.ClearDB();
     int random_amount_of_mutant = random()%(100-10+1)+1;
     cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
+    MutantContainer scumcell(random_amount_of_mutant);
     for (int i=0; i<random_amount_of_mutant; i++)
     {
         scumcell.AddMutant(MutantFactory(MutantType(rand()%3)));
     };
     Iterator<ScumPointer> *it =  new DecoratorLegPower( 
                                 new DecoratorAge( new DecoratorType(scumcell.GetIterator(), MutantType::Vampire),Age::Old), StregthOfLegs::High);
-    //it->First();
     ItogTask(it);
-    //Kill_vampires(it);*/
 };
