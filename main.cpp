@@ -222,6 +222,7 @@ int main()
         cout << "1. ГОРГУЛЬЯ\n";
         cout << "2. ОБОРОТЕНЬ\n";
         cout << "3. ВАМПИР\n";
+        cout << "Ваш выбор: ";
         cin >> z;
         switch(z)
         {
@@ -241,6 +242,7 @@ int main()
         cout << "1. Мощные руки\n";
         cout << "2. Средние руки\n";
         cout << "3. Слабые руки\n";
+        cout << "Ваш выбор: ";
         cin >> z;
         switch(z)
         {
@@ -260,6 +262,7 @@ int main()
         cout << "1. Мощные ноги\n";
         cout << "2. Средние ноги\n";
         cout << "3. Слабые ноги\n";
+        cout << "Ваш выбор: ";
         cin >> z;
         switch(z)
         {
@@ -279,6 +282,7 @@ int main()
         cout << "1. ПОЖИЛОЙ\n";
         cout << "2. МОЛОДОЙ\n";
         cout << "3. НОВОРОЖДЕННЫЙ\n";
+        cout << "Ваш выбор: ";
         cin >> z;
         switch(z)
         {
@@ -303,9 +307,11 @@ int main()
             {
                 scumcell_list.AddMutant(MutantFactory(MutantType(rand()%3)));
             };
-            OurIterator = scumcell_list.GetIterator();
-            //ItogTask(OurIterator);
-            //User_Filter(OurIterator,1);
+            OurIterator = new DecoratorType(
+                new DecoratorLegPower(
+                new DecoratorHandsPower(
+                new DecoratorAge(scumcell_list.GetIterator(), age_choice), power_hand_choice), power_leg_choice), mutant_choice);
+            ItogTask(OurIterator);
         };
         if(user_choice == 2)
         {
@@ -331,8 +337,11 @@ int main()
             {
                 scumcell_sqlite.AddMutant(MutantFactory(MutantType(rand()%3)));
             };
-            OurIterator = scumcell_sqlite.GetIterator();
-            //ItogTask(OurIterator);
+            OurIterator = new DecoratorType(
+                new DecoratorLegPower(
+                new DecoratorHandsPower(
+                new DecoratorAge(scumcell_sqlite.GetIterator(), age_choice), power_hand_choice), power_leg_choice), mutant_choice);
+            ItogTask(OurIterator);
         };
     };
 };
