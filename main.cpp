@@ -198,22 +198,6 @@ Scum *MutantFactory(MutantType newMutant)
     }
 }
 
-void User_Filter(Iterator<ScumPointer> *it,int type_choice)
-{
-    Iterator<ScumPointer> *itog_it;
-    switch(type_choice)
-    {
-        case 1:
-            itog_it = new DecoratorType(it, MutantType::Gargoyle);
-            ItogTask(itog_it);
-            break;
-        case 2:
-            itog_it = new DecoratorType(it, MutantType::Wolfman);
-            ItogTask(itog_it);
-            break;
-    }
-}
-
 int main()
 {
     srand(time(NULL));
@@ -231,6 +215,84 @@ int main()
         {
             break;
         };
+
+        MutantType mutant_choice;
+        int z;
+        cout << "Выберите тип мутанта: \n";
+        cout << "1. ГОРГУЛЬЯ\n";
+        cout << "2. ОБОРОТЕНЬ\n";
+        cout << "3. ВАМПИР\n";
+        cin >> z;
+        switch(z)
+        {
+            case 1:
+                mutant_choice = MutantType::Gargoyle;
+                break;
+            case 2:
+                mutant_choice = MutantType::Wolfman;
+                break;
+            case 3:
+                mutant_choice = MutantType::Vampire;
+                break;
+        };
+
+        StregthOfHands power_hand_choice;
+        cout << "Выберите силу рук: \n";
+        cout << "1. Мощные руки\n";
+        cout << "2. Средние руки\n";
+        cout << "3. Слабые руки\n";
+        cin >> z;
+        switch(z)
+        {
+            case 1:
+                power_hand_choice = StregthOfHands::High;
+                break;
+            case 2:
+                power_hand_choice = StregthOfHands::Medium;
+                break;
+            case 3:
+                power_hand_choice = StregthOfHands::Low;
+                break;
+        };
+
+        StregthOfLegs power_leg_choice;
+        cout << "Выберите силу рук: \n";
+        cout << "1. Мощные ноги\n";
+        cout << "2. Средние ноги\n";
+        cout << "3. Слабые ноги\n";
+        cin >> z;
+        switch(z)
+        {
+            case 1:
+                power_leg_choice = StregthOfLegs::High;
+                break;
+            case 2:
+                power_leg_choice = StregthOfLegs::Medium;
+                break;
+            case 3:
+                power_leg_choice = StregthOfLegs::Low;
+                break;
+        };
+
+        Age age_choice;
+        cout << "Выберите силу рук: \n";
+        cout << "1. ПОЖИЛОЙ\n";
+        cout << "2. МОЛОДОЙ\n";
+        cout << "3. НОВОРОЖДЕННЫЙ\n";
+        cin >> z;
+        switch(z)
+        {
+            case 1:
+                age_choice = Age::Old;
+                break;
+            case 2:
+                age_choice = Age::Young;
+                break;
+            case 3:
+                age_choice = Age::Newborn;
+                break;
+        };
+
         Iterator<ScumPointer> *OurIterator;
         int random_amount_of_mutant = rand()%(100-10+1)+1;
         cout << "Генерируем " << random_amount_of_mutant << " мутантов" << "\n";
@@ -243,7 +305,7 @@ int main()
             };
             OurIterator = scumcell_list.GetIterator();
             //ItogTask(OurIterator);
-            User_Filter(OurIterator,1);
+            //User_Filter(OurIterator,1);
         };
         if(user_choice == 2)
         {
@@ -252,8 +314,11 @@ int main()
             {
                 scumcell_vector.AddMutant(MutantFactory(MutantType(rand()%3)));
             };
-            OurIterator = scumcell_vector.GetIterator();
-            //ItogTask(OurIterator);
+            OurIterator = new DecoratorType(
+                new DecoratorLegPower(
+                new DecoratorHandsPower(
+                new DecoratorAge(scumcell_vector.GetIterator(), age_choice), power_hand_choice), power_leg_choice), mutant_choice);
+            ItogTask(OurIterator);
         };
         if( user_choice == 3)
         {
