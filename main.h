@@ -55,6 +55,7 @@ class ScumContainer
     public:
         virtual void AddMutant(ScumPointer newMutant) = 0;
         virtual int GetCount() = 0;
+        virtual Iterator<ScumPointer> *GetIterator() = 0;
 };
 
 class UltraWildMutantContainerIterator : public Iterator<ScumPointer>
